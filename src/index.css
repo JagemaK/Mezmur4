@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-color: #18181b;
+    --sub-alt-color: #27272a;
+    --sub-color: #71717a;
+    --text-color: #f4f4f5;
+    --main-color: #f59e0b;
+    --main-alt-color: #d97706;
+    --caret-color: #f59e0b;
+    --error-color: #ef4444;
+    --error-extra-color: #991b1b;
+    --surface-color: #202024;
+    --border-color: #3f3f46;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Noto Sans Ethiopic', 'Nyala', sans-serif;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--sub-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--main-color);
+}
+
+/* Monkeytype Caret Animation */
+@keyframes smoothCaret {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+
+.caret-pulse {
+  animation: smoothCaret 1s ease-in-out infinite;
+}
+
+.caret-smooth {
+  transition: transform 0.08s cubic-bezier(0.2, 0, 0, 1), left 0.08s cubic-bezier(0.2, 0, 0, 1), top 0.08s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Active typing text styling */
+.letter {
+  position: relative;
+  transition: color 0.06s ease;
+}
+
+.letter-untyped {
+  color: var(--sub-color);
+  opacity: 0.55;
+}
+
+.letter-correct {
+  color: var(--text-color);
+}
+
+.letter-incorrect {
+  color: var(--error-color);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+.letter-extra {
+  color: var(--error-extra-color);
+  background-color: rgba(239, 68, 68, 0.2);
+  border-radius: 2px;
+}
+
+/* Focus mode transitions */
+.focus-fade {
+  transition: opacity 0.3s ease;
+}
