@@ -35,6 +35,7 @@ export const TRANSLATIONS = {
     accuracy: 'ትክክለኛነት',
     restartHint: 'እንደገና ጀምር',
     tabHint: 'Tab: እንደገና መጀመር • Esc: ማቆም',
+    focusHint: 'ለመጻፍ እዚህ ይጫኑ',
     prevPsalm: 'ቀዳሚ',
     nextPsalm: 'ቀጣይ',
     
@@ -118,6 +119,7 @@ export const TRANSLATIONS = {
     accuracy: 'Accuracy',
     restartHint: 'Restart',
     tabHint: 'Tab: Quick Restart • Esc: Pause',
+    focusHint: 'Click or tap here to start typing',
     prevPsalm: 'Previous',
     nextPsalm: 'Next',
     

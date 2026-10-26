@@ -60,7 +60,7 @@ export default function ChapterDrawer({
         {/* Drawer Header */}
         <div className="p-5 border-b border-[var(--border-color)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[var(--main-color)]/10 border border-[var(--main-color)]/30 flex items-center justify-center text-[var(--main-color)]">
+            <div className="w-9 h-9 rounded-xl bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--main-color)_30%,transparent)] flex items-center justify-center text-[var(--main-color)]">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
@@ -80,7 +80,7 @@ export default function ChapterDrawer({
         </div>
 
         {/* Search & Liturgical Filter */}
-        <div className="p-4 border-b border-[var(--border-color)] space-y-3 bg-[var(--bg-color)]/40">
+        <div className="p-4 border-b border-[var(--border-color)] space-y-3 bg-[color-mix(in_srgb,var(--bg-color)_40%,transparent)]">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--sub-color)]" />
             <input
@@ -122,7 +122,7 @@ export default function ChapterDrawer({
         </div>
 
         {/* Chapters List */}
-        <div className="flex-1 overflow-y-auto p-4 divide-y divide-[var(--border-color)]/40 space-y-1">
+        <div className="flex-1 overflow-y-auto p-4 divide-y divide-[color-mix(in_srgb,var(--border-color)_40%,transparent)] space-y-1">
           {filteredPsalms.length === 0 ? (
             <div className="p-8 text-center text-xs text-[var(--sub-color)]">
               {t.noResultsFound}
@@ -143,7 +143,7 @@ export default function ChapterDrawer({
                     onSelectPsalm(psalm);
                     onClose();
                   }}
-                  className={`w-full py-3 px-3 rounded-xl flex items-center justify-between text-left transition-all ${isCurrent ? 'bg-[var(--main-color)]/10 border border-[var(--main-color)]/40' : 'hover:bg-[var(--sub-alt-color)]/60'}`}
+                  className={`w-full py-3 px-3 rounded-xl flex items-center justify-between text-left transition-all ${isCurrent ? 'bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--main-color)_40%,transparent)]' : 'hover:bg-[color-mix(in_srgb,var(--sub-alt-color)_60%,transparent)]'}`}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center font-mono ${isCurrent ? 'bg-[var(--main-color)] text-black font-bold' : 'bg-[var(--sub-alt-color)] text-[var(--text-color)] border border-[var(--border-color)]'}`}>

@@ -60,7 +60,7 @@ export default function ResultsModal({
   const psalmTitle = isEnglish ? (psalm.titleEn || `Psalm ${psalm.chapter}`) : (psalm.titleAm || psalm.title);
   const chapterName = isEnglish ? `Psalm ${psalm.chapter}` : `መዝሙር ${psalm.geezNumber || psalm.chapter}`;
   const dayName = isEnglish ? psalm.dayEn : psalm.dayAm;
-  const passageText = (isEnglish ? psalm.versesEn : psalm.versesAm)?.join(' ') || '';
+  const passageText = ((isEnglish ? psalm.versesEn : psalm.versesAm)?.join(' ') || '').replace(/\s+([,.;:!?።፤፥፣፧])/g, '$1');
 
   const copyShareText = () => {
     const text = `DawitType | ዳዊት ታይፕ
@@ -81,7 +81,7 @@ export default function ResultsModal({
         {/* Header Ribbon */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-[var(--border-color)] gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[var(--main-color)]/10 border border-[var(--main-color)]/30 flex items-center justify-center text-[var(--main-color)]">
+            <div className="w-12 h-12 rounded-2xl bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--main-color)_30%,transparent)] flex items-center justify-center text-[var(--main-color)]">
               <Trophy className="w-6 h-6" />
             </div>
             <div>
@@ -125,29 +125,29 @@ export default function ResultsModal({
             </div>
           </div>
 
-          <div className="md:col-span-3 bg-[var(--bg-color)]/50 border border-[var(--border-color)] rounded-2xl p-4">
+          <div className="md:col-span-3 bg-[color-mix(in_srgb,var(--bg-color)_50%,transparent)] border border-[var(--border-color)] rounded-2xl p-4">
             <PerformanceChart timeline={timeline} />
           </div>
         </div>
 
         {/* Secondary Metrics Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-6 font-mono text-center">
-          <div className="p-3 rounded-xl bg-[var(--sub-alt-color)]/60 border border-[var(--border-color)]">
+          <div className="p-3 rounded-xl bg-[color-mix(in_srgb,var(--sub-alt-color)_60%,transparent)] border border-[var(--border-color)]">
             <div className="text-[11px] text-[var(--sub-color)]">{t.rawWpm}</div>
             <div className="text-xl font-bold text-[var(--text-color)]">{rawWpm}</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-[var(--sub-alt-color)]/60 border border-[var(--border-color)]">
+          <div className="p-3 rounded-xl bg-[color-mix(in_srgb,var(--sub-alt-color)_60%,transparent)] border border-[var(--border-color)]">
             <div className="text-[11px] text-[var(--sub-color)]">{t.cpm}</div>
             <div className="text-xl font-bold text-[var(--text-color)]">{cpm}</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-[var(--sub-alt-color)]/60 border border-[var(--border-color)]">
+          <div className="p-3 rounded-xl bg-[color-mix(in_srgb,var(--sub-alt-color)_60%,transparent)] border border-[var(--border-color)]">
             <div className="text-[11px] text-[var(--sub-color)]">{t.consistency}</div>
             <div className="text-xl font-bold text-[var(--text-color)]">{consistency}%</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-[var(--sub-alt-color)]/60 border border-[var(--border-color)]">
+          <div className="p-3 rounded-xl bg-[color-mix(in_srgb,var(--sub-alt-color)_60%,transparent)] border border-[var(--border-color)]">
             <div className="text-[11px] text-[var(--sub-color)]">{t.charBreakdown}</div>
             <div className="text-xs font-bold text-[var(--text-color)] mt-1">
               <span className="text-[var(--text-color)]">{keystrokes?.correct || 0}</span> / 
@@ -159,7 +159,7 @@ export default function ResultsModal({
         </div>
 
         {/* Scripture Reflection & Full Text Preview Box */}
-        <div className="my-6 p-4 rounded-2xl bg-[var(--sub-alt-color)]/40 border border-[var(--border-color)] text-xs text-[var(--sub-color)] max-h-36 overflow-y-auto leading-relaxed">
+        <div className="my-6 p-4 rounded-2xl bg-[color-mix(in_srgb,var(--sub-alt-color)_40%,transparent)] border border-[var(--border-color)] text-xs text-[var(--sub-color)] max-h-36 overflow-y-auto leading-relaxed">
           <div className="font-semibold text-[var(--text-color)] mb-2 flex items-center gap-1.5">
             <BookOpen className="w-3.5 h-3.5 text-[var(--main-color)]" />
             <span>{t.scripturePassage}</span>
