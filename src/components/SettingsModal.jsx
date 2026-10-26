@@ -22,7 +22,7 @@ export default function SettingsModal({
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[var(--main-color)]/10 border border-[var(--main-color)]/30 flex items-center justify-center text-[var(--main-color)]">
+            <div className="w-10 h-10 rounded-2xl bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--main-color)_30%,transparent)] flex items-center justify-center text-[var(--main-color)]">
               <SettingsIcon className="w-5 h-5" />
             </div>
             <div>
@@ -47,7 +47,7 @@ export default function SettingsModal({
         <div className="flex-1 overflow-y-auto my-4 space-y-5 pr-1 text-xs">
           
           {/* Interface Language & Psalm Text Language */}
-          <div className="p-4 rounded-2xl bg-[var(--bg-color)]/50 border border-[var(--border-color)] space-y-3">
+          <div className="p-4 rounded-2xl bg-[color-mix(in_srgb,var(--bg-color)_50%,transparent)] border border-[var(--border-color)] space-y-3">
             <div>
               <div className="font-semibold text-[var(--text-color)] mb-1.5 flex items-center gap-1.5">
                 <Globe className="w-3.5 h-3.5 text-[var(--main-color)]" />
@@ -69,7 +69,7 @@ export default function SettingsModal({
               </div>
             </div>
 
-            <div className="pt-2 border-t border-[var(--border-color)]/50">
+            <div className="pt-2 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
               <div className="font-semibold text-[var(--text-color)] mb-1.5 flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-[var(--main-color)]" />
                 <span>{isEnglish ? 'Psalm Scripture Version' : 'የመዝሙረ ዳዊት ቅጂ'}</span>
@@ -92,7 +92,7 @@ export default function SettingsModal({
           </div>
 
           {/* Caret Style */}
-          <div className="p-4 rounded-2xl bg-[var(--bg-color)]/50 border border-[var(--border-color)]">
+          <div className="p-4 rounded-2xl bg-[color-mix(in_srgb,var(--bg-color)_50%,transparent)] border border-[var(--border-color)]">
             <div className="font-semibold text-[var(--text-color)] mb-2.5">
               {isEnglish ? 'Caret Style' : 'የጠቋሚ ቅርጽ (Caret Style)'}
             </div>
@@ -115,7 +115,7 @@ export default function SettingsModal({
           </div>
 
           {/* Font Size */}
-          <div className="p-4 rounded-2xl bg-[var(--bg-color)]/50 border border-[var(--border-color)]">
+          <div className="p-4 rounded-2xl bg-[color-mix(in_srgb,var(--bg-color)_50%,transparent)] border border-[var(--border-color)]">
             <div className="font-semibold text-[var(--text-color)] mb-2.5">
               {isEnglish ? 'Font Size' : 'የፊደል መጠን (Font Size)'}
             </div>
@@ -138,7 +138,7 @@ export default function SettingsModal({
           </div>
 
           {/* Sound Type & Volume */}
-          <div className="p-4 rounded-2xl bg-[var(--bg-color)]/50 border border-[var(--border-color)] space-y-3">
+          <div className="p-4 rounded-2xl bg-[color-mix(in_srgb,var(--bg-color)_50%,transparent)] border border-[var(--border-color)] space-y-3">
             <div className="font-semibold text-[var(--text-color)]">
               {isEnglish ? 'Keyboard Sound Synthesis' : 'የቁልፍ ድምፅ (Key Sound)'}
             </div>

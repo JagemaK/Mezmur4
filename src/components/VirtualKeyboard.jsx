@@ -47,12 +47,12 @@ export default function VirtualKeyboard({
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 my-2 transition-all select-none">
-      <div className="bg-[var(--surface-color)]/90 backdrop-blur-md border border-[var(--border-color)] rounded-2xl p-3 shadow-lg">
+      <div className="bg-[color-mix(in_srgb,var(--surface-color)_90%,transparent)] backdrop-blur-md border border-[var(--border-color)] rounded-2xl p-3 shadow-lg">
         
         {/* Keyboard Header: Layout Selector & Status */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-2.5 mb-2.5 border-b border-[var(--border-color)] text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[var(--main-color)]/10 text-[var(--main-color)] flex items-center justify-center">
+            <div className="w-6 h-6 rounded-lg bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] text-[var(--main-color)] flex items-center justify-center">
               <KeyboardIcon className="w-3.5 h-3.5" />
             </div>
             <span className="font-semibold text-[var(--text-color)]">
@@ -95,7 +95,7 @@ export default function VirtualKeyboard({
 
         {/* Dynamic Fidel Order Matrix Ribbon (when a consonant is active) */}
         {!isCollapsed && activeFamilyLetters && (
-          <div className="mb-3 p-2 rounded-xl bg-[var(--bg-color)]/70 border border-amber-500/30 flex items-center justify-between text-xs font-mono animate-in fade-in duration-150">
+          <div className="mb-3 p-2 rounded-xl bg-[color-mix(in_srgb,var(--bg-color)_70%,transparent)] border border-amber-500/30 flex items-center justify-between text-xs font-mono animate-in fade-in duration-150">
             <div className="flex items-center gap-1.5 text-[var(--main-color)] text-[11px] font-sans font-semibold">
               <Sparkles className="w-3 h-3" />
               <span>{language === 'am' ? 'የፊደል ረድፎች (Orders):' : 'Vowel Orders:'}</span>
@@ -168,7 +168,7 @@ export default function VirtualKeyboard({
 function renderKeycap(k, cap, lastPressedKey, isShiftActive, onKeyClick) {
   if (!cap) {
     return (
-      <div key={k} className="w-8 sm:w-11 h-12 rounded-xl bg-[var(--sub-alt-color)]/40 border border-[var(--border-color)]/60 flex items-center justify-center text-xs text-[var(--sub-color)]">
+      <div key={k} className="w-8 sm:w-11 h-12 rounded-xl bg-[color-mix(in_srgb,var(--sub-alt-color)_40%,transparent)] border border-[color-mix(in_srgb,var(--border-color)_60%,transparent)] flex items-center justify-center text-xs text-[var(--sub-color)]">
         {k.toUpperCase()}
       </div>
     );

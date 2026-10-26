@@ -17,6 +17,10 @@
     --border-color: #3f3f46;
   }
 
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -63,7 +67,7 @@
 
 .letter-untyped {
   color: var(--sub-color);
-  opacity: 0.55;
+  opacity: 0.85;
 }
 
 .letter-correct {
@@ -85,4 +89,69 @@
 /* Focus mode transitions */
 .focus-fade {
   transition: opacity 0.3s ease;
+}
+
+/* Words submitted with a mistake get a subtle underline, like Monkeytype */
+.word-error {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--error-color) 60%, transparent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+/* Soft ambient glow behind the app, tinted by the active theme */
+.app-shell {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--main-color) 9%, transparent), transparent 70%),
+    var(--bg-color);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--main-color) 28%, transparent);
+  color: var(--text-color);
+}
+
+/* Visible keyboard focus for every control */
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input[type="range"]:focus-visible {
+  outline: 2px solid var(--main-color);
+  outline-offset: 2px;
+}
+
+/* Fade the top/bottom edges of the scrolling passage */
+.typing-text {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 0.75rem, #000 calc(100% - 1.5rem), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 0.75rem, #000 calc(100% - 1.5rem), transparent 100%);
+  padding: 0.5rem 0 1.25rem;
+  scrollbar-width: none;
+}
+.typing-text::-webkit-scrollbar {
+  display: none;
+}
+
+/* Lightweight stand-ins for the tailwindcss-animate utilities used by modals */
+@keyframes dt-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes dt-zoom-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes dt-slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.animate-in.fade-in { animation: dt-fade-in 0.2s ease-out both; }
+.animate-in.zoom-in-95 { animation: dt-zoom-in 0.16s ease-out both; }
+.animate-in.slide-in-from-right { animation: dt-slide-in-right 0.25s cubic-bezier(0.2, 0, 0, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

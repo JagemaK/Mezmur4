@@ -16,7 +16,7 @@ export default function HistoryModal({
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[var(--main-color)]/10 border border-[var(--main-color)]/30 flex items-center justify-center text-[var(--main-color)]">
+            <div className="w-10 h-10 rounded-2xl bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--main-color)_30%,transparent)] flex items-center justify-center text-[var(--main-color)]">
               <BarChart2 className="w-5 h-5" />
             </div>
             <div>
@@ -36,7 +36,7 @@ export default function HistoryModal({
         </div>
 
         {/* History List */}
-        <div className="flex-1 overflow-y-auto my-4 divide-y divide-[var(--border-color)]/50">
+        <div className="flex-1 overflow-y-auto my-4 divide-y divide-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
           {!history || history.length === 0 ? (
             <div className="p-12 text-center text-xs text-[var(--sub-color)]">
               ምንም የተመዘገበ ታሪክ የለም። የመጀመሪያዎን መዝሙር ይተይቡ!

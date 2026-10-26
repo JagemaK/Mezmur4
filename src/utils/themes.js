@@ -149,4 +149,7 @@ export function applyTheme(themeId) {
   root.style.setProperty('--error-color', theme.colors.error);
   root.style.setProperty('--error-extra-color', theme.colors.errorExtra);
   root.style.setProperty('--border-color', theme.colors.border);
+
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) metaTheme.setAttribute('content', theme.colors.bg);
 }
