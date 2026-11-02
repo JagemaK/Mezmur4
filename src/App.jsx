@@ -44,6 +44,7 @@ export default function App() {
   // Real-time key tracking for on-screen virtual keyboard
   const [lastPressedKey, setLastPressedKey] = useState(null);
   const [isShiftActive, setIsShiftActive] = useState(false);
+  const [keyHint, setKeyHint] = useState(null);
 
   // Results
   const [testResults, setTestResults] = useState(null);
@@ -194,6 +195,7 @@ export default function App() {
           onNextPsalm={handleNextPsalm}
           onPrevPsalm={handlePrevPsalm}
           onKeyActivity={handleKeyActivity}
+          onKeyHint={setKeyHint}
         />
 
         {/* Interactive On-Screen Virtual Keyboard (when Amharic text mode is active) */}
@@ -203,6 +205,7 @@ export default function App() {
               activeLayout={settings.keyboardLayout || 'powergeez'}
               onSelectLayout={(layoutId) => updateSettings({ keyboardLayout: layoutId })}
               lastPressedKey={lastPressedKey}
+              keyHint={keyHint}
               isShiftActive={isShiftActive}
               language={settings.language}
             />
@@ -287,6 +290,7 @@ export default function App() {
       <PhoneticGuideModal
         isOpen={isPhoneticGuideOpen}
         onClose={() => setIsPhoneticGuideOpen(false)}
+        layout={settings.keyboardLayout || 'powergeez'}
       />
 
       {/* Settings Modal */}

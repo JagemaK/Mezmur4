@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { X, HelpCircle, Keyboard, Sparkles } from 'lucide-react';
-import { EthiopicPhoneticEngine, FIDEL_MAP } from '../utils/ethiopicTransliteration';
+import { EthiopicPhoneticEngine, FIDEL_FAMILIES, getKeySequences } from '../utils/ethiopicTransliteration';
 
-export default function PhoneticGuideModal({ isOpen, onClose }) {
+export default function PhoneticGuideModal({ isOpen, onClose, layout = 'powergeez' }) {
+  const engineLayout = layout === 'direct' ? 'powergeez' : layout;
   const [testInput, setTestInput] = useState('');
   const [testOutput, setTestOutput] = useState('');
-  const engine = React.useMemo(() => new EthiopicPhoneticEngine(), []);
+  const engine = React.useMemo(() => new EthiopicPhoneticEngine(engineLayout), [engineLayout]);
 
   if (!isOpen) return null;
 
   const handleTestKey = (e) => {
     if (e.key === 'Backspace') {
+      engine.reset();
       setTestInput(prev => prev.slice(0, -1));
       setTestOutput(prev => prev.slice(0, -1));
       return;
@@ -28,27 +30,18 @@ export default function PhoneticGuideModal({ isOpen, onClose }) {
     }
   };
 
-  const sampleLetters = [
-    { key: 'h', name: 'ሀ', row: ['ሀ (he)', 'ሁ (hu)', 'ሂ (hi)', 'ሃ (ha)', 'ሄ (hie)', 'ህ (h)', 'ሆ (ho)', 'ኋ (hwa)'] },
-    { key: 'l', name: 'ለ', row: ['ለ (le)', 'ሉ (lu)', 'ሊ (li)', 'ላ (la)', 'ሌ (lie)', 'ል (l)', 'ሎ (lo)', 'ሏ (lwa)'] },
-    { key: 'm', name: 'መ', row: ['መ (me)', 'ሙ (mu)', 'ሚ (mi)', 'ማ (ma)', 'ሜ (mie)', 'ም (m)', 'ሞ (mo)', 'ሟ (mwa)'] },
-    { key: 's', name: 'ሰ', row: ['ሰ (se)', 'ሱ (su)', 'ሲ (si)', 'ሳ (sa)', 'ሴ (sie)', 'ስ (s)', 'ሶ (so)', 'ሷ (swa)'] },
-    { key: 'sh', name: 'ሸ', row: ['ሸ (she)', 'ሹ (shu)', 'ሺ (shi)', 'ሻ (sha)', 'ሼ (shie)', 'ሽ (sh)', 'ሾ (sho)', 'ሿ (shwa)'] },
-    { key: 'b', name: 'በ', row: ['በ (be)', 'ቡ (bu)', 'ቢ (bi)', 'ባ (ba)', 'ቤ (bie)', 'ብ (b)', 'ቦ (bo)', 'ቧ (bwa)'] },
-    { key: 't', name: 'ተ', row: ['ተ (te)', 'ቱ (tu)', 'ቲ (ti)', 'ታ (ta)', 'ቴ (tie)', 'ት (t)', 'ቶ (to)', 'ቷ (twa)'] },
-    { key: 'ch', name: 'ቸ', row: ['ቸ (che)', 'ቹ (chu)', 'ቺ (chi)', 'ቻ (cha)', 'ቼ (chie)', 'ች (ch)', 'ቾ (cho)', 'ቿ (chwa)'] },
-    { key: 'n', name: 'ነ', row: ['ነ (ne)', 'ኑ (nu)', 'ኒ (ni)', 'ና (na)', 'ኔ (nie)', 'ን (n)', 'ኖ (no)', 'ኗ (nwa)'] },
-    { key: 'ny', name: 'ኘ', row: ['ኘ (nye)', 'ኙ (nyu)', 'ኚ (nyi)', 'ኛ (nya)', 'ኜ (nyie)', 'ኝ (ny)', 'ኞ (nyo)', 'ኟ (nywa)'] },
-    { key: 'a', name: 'አ', row: ['አ (a/e)', 'ኡ (u)', 'ኢ (i)', 'ኣ (aa)', 'ኤ (ie)', 'እ (e/i)', 'ኦ (o)', 'ኧ (ea)'] },
-    { key: 'k', name: 'ከ', row: ['ከ (ke)', 'ኩ (ku)', 'ኪ (ki)', 'ካ (ka)', 'ኬ (kie)', 'ክ (k)', 'ኮ (ko)', 'ኳ (kwa)'] },
-    { key: 'w', name: 'ወ', row: ['ወ (we)', 'ዉ (wu)', 'ዊ (wi)', 'ዋ (wa)', 'ዌ (wie)', 'ው (w)', 'ዎ (wo)', ''] },
-    { key: 'z', name: 'ዘ', row: ['ዘ (ze)', 'ዙ (zu)', 'ዚ (zi)', 'ዛ (za)', 'ዜ (zie)', 'ዝ (z)', 'ዞ (zo)', 'ዟ (zwa)'] },
-    { key: 'd', name: 'ደ', row: ['ደ (de)', 'ዱ (du)', 'ዲ (di)', 'ዳ (da)', 'ዴ (die)', 'ድ (d)', 'ዶ (do)', 'ዷ (dwa)'] },
-    { key: 'g', name: 'ገ', row: ['ገ (ge)', 'ጉ (gu)', 'ጊ (gi)', 'ጋ (ga)', 'ጌ (gie)', 'ግ (g)', 'ጎ (go)', 'ጓ (gwa)'] },
-    { key: 'T', name: 'ጠ', row: ['ጠ (Te)', 'ጡ (Tu)', 'ጢ (Ti)', 'ጣ (Ta)', 'ጤ (Tie)', 'ጥ (T)', 'ጦ (To)', 'ጧ (Twa)'] },
-    { key: 'ts', name: 'ጸ', row: ['ጸ (tse)', 'ጹ (tsu)', 'ጺ (tsi)', 'ጻ (tsa)', 'ጼ (tsie)', 'ጽ (ts)', 'ጾ (tso)', 'ጿ (tswa)'] },
-    { key: 'f', name: 'ፈ', row: ['ፈ (fe)', 'ፉ (fu)', 'ፊ (fi)', 'ፋ (fa)', 'ፌ (fie)', 'ፍ (f)', 'ፎ (fo)', 'ፏ (fwa)'] },
-  ];
+  // Rows generated from the engine so the guide always matches real input
+  const sequences = getKeySequences(engineLayout);
+  const sampleLetters = Object.values(FIDEL_FAMILIES)
+    .map(letters => ({
+      key: sequences[letters[5]] || '',
+      row: letters.map((fidel, idx) => {
+        if (idx === 7 && letters.indexOf(fidel) !== 7) return '';
+        return sequences[fidel] ? `${fidel} (${sequences[fidel]})` : '';
+      }),
+    }))
+    .filter(item => item.key)
+    .sort((a, b) => a.key.toLowerCase().localeCompare(b.key.toLowerCase()) || a.key.localeCompare(b.key));
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
@@ -100,7 +93,7 @@ export default function PhoneticGuideModal({ isOpen, onClose }) {
               onChange={() => {}}
               className="w-full sm:w-1/2 bg-[var(--surface-color)] border border-[var(--border-color)] rounded-xl px-3 py-2 text-xs text-[var(--text-color)] outline-none focus:border-[var(--main-color)]"
             />
-            <div className="w-full sm:w-1/2 p-2 bg-[var(--surface-color)] border border-amber-500/30 rounded-xl text-base font-medium text-[var(--main-color)] min-h-[38px] flex items-center">
+            <div className="w-full sm:w-1/2 p-2 bg-[var(--surface-color)] border border-[color-mix(in_srgb,var(--main-color)_30%,transparent)] rounded-xl text-base font-medium text-[var(--main-color)] min-h-[38px] flex items-center">
               {testOutput || <span className="text-xs text-[var(--sub-color)] font-normal">ውጤቱ እዚህ ይታያል...</span>}
             </div>
           </div>
@@ -122,7 +115,7 @@ export default function PhoneticGuideModal({ isOpen, onClose }) {
           </div>
           <div className="p-2.5 rounded-xl bg-[var(--sub-alt-color)] border border-[var(--border-color)]">
             <div className="text-[var(--text-color)] font-bold">ሥርዓተ-ነጥብ</div>
-            <div className="text-[11px] text-[var(--main-color)]">:: = ። | , = ፣ | ; = ፤</div>
+            <div className="text-[11px] text-[var(--main-color)]">:: = ። | :- = ፥ | ; = ፤ | , = ፣ | ' = split</div>
           </div>
         </div>
 
@@ -135,10 +128,10 @@ export default function PhoneticGuideModal({ isOpen, onClose }) {
               <div>ካዕብ (u)</div>
               <div>ሣልስ (i)</div>
               <div>ራብዕ (a)</div>
-              <div>ኃምስ (ie)</div>
+              <div>ኃምስ (E)</div>
               <div>ሳድስ (-)</div>
               <div>ሳብዕ (o)</div>
-              <div>ሳምንት (wa)</div>
+              <div>ሳምንት (W)</div>
             </div>
 
             <div className="divide-y divide-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">

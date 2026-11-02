@@ -45,18 +45,35 @@
   background: var(--main-color);
 }
 
-/* Monkeytype Caret Animation */
-@keyframes smoothCaret {
+/* Monkeytype-style caret: glides between letters, solid while typing,
+   blinks only when idle */
+.caret {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: var(--caret-color);
+  border-radius: 9999px;
+  transition: left 0.1s ease-out, top 0.1s ease-out, width 0.1s ease-out;
+}
+.caret-block {
+  opacity: 0.35;
+  border-radius: 0.1em;
+}
+.caret-blink {
+  animation: caretBlink 1s ease-in-out infinite;
+}
+.caret-block.caret-blink {
+  animation-name: caretBlinkBlock;
+}
+@keyframes caretBlink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.15; }
+  50% { opacity: 0; }
 }
-
-.caret-pulse {
-  animation: smoothCaret 1s ease-in-out infinite;
-}
-
-.caret-smooth {
-  transition: transform 0.08s cubic-bezier(0.2, 0, 0, 1), left 0.08s cubic-bezier(0.2, 0, 0, 1), top 0.08s cubic-bezier(0.2, 0, 0, 1);
+@keyframes caretBlinkBlock {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0; }
 }
 
 /* Active typing text styling */
@@ -72,6 +89,11 @@
 
 .letter-correct {
   color: var(--text-color);
+}
+
+.letter-composing {
+  color: var(--main-color);
+  opacity: 0.8;
 }
 
 .letter-incorrect {
@@ -120,11 +142,8 @@ input[type="range"]:focus-visible {
   outline-offset: 2px;
 }
 
-/* Fade the top/bottom edges of the scrolling passage */
+/* Passage shows exactly three lines (height set in TypingArea) */
 .typing-text {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 0.75rem, #000 calc(100% - 1.5rem), transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 0.75rem, #000 calc(100% - 1.5rem), transparent 100%);
-  padding: 0.5rem 0 1.25rem;
   scrollbar-width: none;
 }
 .typing-text::-webkit-scrollbar {
@@ -147,6 +166,16 @@ input[type="range"]:focus-visible {
 .animate-in.fade-in { animation: dt-fade-in 0.2s ease-out both; }
 .animate-in.zoom-in-95 { animation: dt-zoom-in 0.16s ease-out both; }
 .animate-in.slide-in-from-right { animation: dt-slide-in-right 0.25s cubic-bezier(0.2, 0, 0, 1) both; }
+
+/* Next key to press on the on-screen keyboard */
+.key-next {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--main-color) 35%, transparent);
+  animation: keyNextPulse 1.4s ease-in-out infinite;
+}
+@keyframes keyNextPulse {
+  0%, 100% { box-shadow: 0 0 0 2px color-mix(in srgb, var(--main-color) 35%, transparent); }
+  50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--main-color) 10%, transparent); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
