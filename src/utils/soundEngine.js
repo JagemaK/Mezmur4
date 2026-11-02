@@ -1,6 +1,6 @@
 // Web Audio API Sound Synthesizer for Mechanical Keyboard and Ethiopian Begena
 
-import { BEGENA_STRINGS, keyToString } from './begena/voice.js';
+import { BEGENA_NOTES, BEGENA_SPRITE_URL, keyToString } from './begena/notes.js';
 
 class SoundEngine {
   constructor() {
@@ -9,8 +9,7 @@ class SoundEngine {
     this.volume = 0.5;
     this.notes = [220, 247.5, 275, 330, 367.5, 440, 495, 550]; // Meditative pentatonic mode (ዜማ)
     this.noteIndex = 0;
-    this.stringBuffers = {};   // `${string}:${variant}` -> AudioBuffer
-    this.stringData = {};      // raw samples from the worker
+    this.stringBuffers = {};   // string -> [AudioBuffer variants]
     this.stringVariant = {};
     this.voices = [];          // { src, gain, string }
     this.bus = null;
@@ -27,7 +26,7 @@ class SoundEngine {
     const dry = ctx.createGain();
     dry.gain.value = 0.85;
     const wet = ctx.createGain();
-    wet.gain.value = 0.22;
+    wet.gain.value = 0.08;
     const reverb = ctx.createConvolver();
     const len = Math.floor(ctx.sampleRate * 1.6);
     const ir = ctx.createBuffer(2, len, ctx.sampleRate);
@@ -57,34 +56,34 @@ class SoundEngine {
     return input;
   }
 
-  // Physical-model strings are rendered in a worker (~50 ms each) as soon as
-  // this sound is selected; notes play once their string is ready.
+  // Load the real begena notes once (one small sprite) and cut them into
+  // per-string buffers
   warmUpBegena() {
-    if (this.begenaWorker || typeof Worker === 'undefined') return;
-    try {
-      this.begenaWorker = new Worker(new URL('./begena/worker.js', import.meta.url), { type: 'module' });
-    } catch {
-      return;
-    }
-    this.begenaWorker.onmessage = ({ data }) => {
-      this.stringData[`${data.string}:${data.variant}`] = data;
-    };
-    this.begenaWorker.postMessage('render');
+    if (this.begenaLoading) return;
+    this.init();
+    if (!this.ctx || typeof fetch === 'undefined') return;
+    this.begenaLoading = fetch(BEGENA_SPRITE_URL)
+      .then(res => res.arrayBuffer())
+      .then(data => new Promise((resolve, reject) => this.ctx.decodeAudioData(data, resolve, reject)))
+      .then(sprite => {
+        const src = sprite.getChannelData(0);
+        for (const [string, variant, start, duration] of BEGENA_NOTES) {
+          const from = Math.floor(start * sprite.sampleRate);
+          const len = Math.floor(duration * sprite.sampleRate);
+          const buffer = this.ctx.createBuffer(1, len, sprite.sampleRate);
+          buffer.copyToChannel(src.subarray(from, from + len), 0);
+          (this.stringBuffers[string] ||= []).push(buffer);
+        }
+      })
+      .catch(() => { this.begenaLoading = null; });
   }
 
+  // Alternate between the recorded variants of a string
   getStringBuffer(string) {
-    this.stringVariant[string] = ((this.stringVariant[string] || 0) + 1) % 2;
-    const key = `${string}:${this.stringVariant[string]}`;
-    const fallback = `${string}:0`;
-    const k = this.stringData[key] ? key : fallback;
-    if (!this.stringData[k]) return null;
-    if (!this.stringBuffers[k]) {
-      const { data, sampleRate } = this.stringData[k];
-      const buffer = this.ctx.createBuffer(1, data.length, sampleRate);
-      buffer.copyToChannel(data, 0);
-      this.stringBuffers[k] = buffer;
-    }
-    return this.stringBuffers[k];
+    const list = this.stringBuffers[string];
+    if (!list || !list.length) return null;
+    this.stringVariant[string] = ((this.stringVariant[string] || 0) + 1) % list.length;
+    return list[this.stringVariant[string]];
   }
 
   // Start a plucked string; re-plucking a ringing string damps it first
@@ -102,7 +101,6 @@ class SoundEngine {
     if (!buffer) return;
     const src = ctx.createBufferSource();
     src.buffer = buffer;
-    src.playbackRate.value = 1 + (Math.random() - 0.5) * 0.002; // tiny natural detune
     const gain = ctx.createGain();
     const level = this.volume * velocity * 0.6;
     let node = src;
