@@ -122,6 +122,27 @@ export default function App() {
     setIsTyping(false);
   };
 
+  const startDailyReading = () => {
+    setCurrentPsalmIndex(Math.min(todayLiturgicalDay.startIndex, psalms.length - 1));
+    setTestResults(null);
+  };
+
+  // Escape closes whichever overlay is open
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      setIsChapterDrawerOpen(false);
+      setIsProgressMapOpen(false);
+      setIsHistoryModalOpen(false);
+      setIsSettingsModalOpen(false);
+      setIsPhoneticGuideOpen(false);
+      setIsKeyboardMappingModalOpen(false);
+      setTestResults(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const handleKeyActivity = (key, isShift) => {
     setLastPressedKey(key);
     setIsShiftActive(isShift);
@@ -130,7 +151,7 @@ export default function App() {
   const completedCount = Object.keys(progress.completedChapters || {}).length;
 
   return (
-    <div className="min-h-screen flex flex-col justify-between selection:bg-amber-500/25 selection:text-amber-300">
+    <div className="app-shell min-h-screen flex flex-col justify-between">
       
       {/* Top Header */}
       <Header
@@ -144,6 +165,7 @@ export default function App() {
         openSettingsModal={() => setIsSettingsModalOpen(true)}
         openPhoneticGuide={() => setIsPhoneticGuideOpen(true)}
         openKeyboardMappingModal={() => setIsKeyboardMappingModalOpen(true)}
+        startDailyReading={startDailyReading}
         todayLiturgicalDay={todayLiturgicalDay}
         completedCount={completedCount}
         streak={progress.streak || 1}
@@ -151,7 +173,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col justify-center py-2">
+      <main className="flex-1 flex flex-col justify-center py-4 sm:py-6">
         {/* Monkeytype Pill Bar Controls */}
         <ControlBar
           currentPsalm={currentPsalm}
@@ -189,8 +211,8 @@ export default function App() {
       </main>
 
       {/* Minimalist Footer */}
-      <footer className={`w-full max-w-4xl mx-auto px-4 py-4 text-center text-xs text-[var(--sub-color)] flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-[var(--border-color)]/30 font-mono transition-opacity duration-300 ${isTyping ? 'opacity-0' : 'opacity-70'}`}>
-        <div className="flex items-center gap-3">
+      <footer className={`w-full max-w-4xl mx-auto px-4 py-4 text-center text-xs text-[var(--sub-color)] flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-[color-mix(in_srgb,var(--border-color)_30%,transparent)] font-mono transition-opacity duration-300 ${isTyping ? 'opacity-0' : 'opacity-70'}`}>
+        <div className="hidden sm:flex items-center gap-3">
           <span>{t.tabHint}</span>
           <span>•</span>
           <span className="text-[var(--main-color)]">

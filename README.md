@@ -76,6 +76,10 @@ npm run build
 npm run preview
 ```
 
+### Deploy to Vercel
+The repo ships a `vercel.json` (Vite preset, SPA rewrites, long-lived caching for hashed assets).
+Import the repository at [vercel.com/new](https://vercel.com/new) and every push to the connected branch deploys automatically — or run `npx vercel --prod` locally.
+
 ---
 
 ## 🛠️ Tech Stack

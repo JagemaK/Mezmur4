@@ -37,32 +37,32 @@ export default function ControlBar({
       <div className="bg-[var(--surface-color)] border border-[var(--border-color)] rounded-2xl p-1.5 flex flex-wrap items-center justify-between gap-2 shadow-sm text-xs text-[var(--sub-color)]">
         
         {/* Left side: Test Modes (Chapter / Verse / Timed) */}
-        <div className="flex items-center gap-1 bg-[var(--sub-alt-color)]/50 p-1 rounded-xl">
+        <div className="flex items-center gap-1 bg-[color-mix(in_srgb,var(--sub-alt-color)_50%,transparent)] p-1 rounded-xl">
           <button
             onClick={() => updateSettings({ mode: 'chapter' })}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${settings.mode === 'chapter' ? 'bg-[var(--surface-color)] text-[var(--main-color)] shadow-sm' : 'hover:text-[var(--text-color)]'}`}
+            className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${settings.mode === 'chapter' ? 'bg-[var(--surface-color)] text-[var(--main-color)] shadow-sm' : 'hover:text-[var(--text-color)]'}`}
             title={t.modeFullChapter}
           >
-            <FileText className="w-3.5 h-3.5" />
-            <span>{t.modeFullChapter}</span>
+            <FileText className="w-3.5 h-3.5 hidden sm:block" />
+            <span className="whitespace-nowrap">{t.modeFullChapter}</span>
           </button>
 
           <button
             onClick={() => updateSettings({ mode: 'verse' })}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${settings.mode === 'verse' ? 'bg-[var(--surface-color)] text-[var(--main-color)] shadow-sm' : 'hover:text-[var(--text-color)]'}`}
+            className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${settings.mode === 'verse' ? 'bg-[var(--surface-color)] text-[var(--main-color)] shadow-sm' : 'hover:text-[var(--text-color)]'}`}
             title={t.modeVerseByVerse}
           >
-            <ListOrdered className="w-3.5 h-3.5" />
-            <span>{t.modeVerseByVerse}</span>
+            <ListOrdered className="w-3.5 h-3.5 hidden sm:block" />
+            <span className="whitespace-nowrap">{t.modeVerseByVerse}</span>
           </button>
 
           <button
             onClick={() => updateSettings({ mode: 'timed' })}
-            className={`px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${settings.mode === 'timed' ? 'bg-[var(--surface-color)] text-[var(--main-color)] shadow-sm' : 'hover:text-[var(--text-color)]'}`}
+            className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-medium transition-all flex items-center gap-1.5 ${settings.mode === 'timed' ? 'bg-[var(--surface-color)] text-[var(--main-color)] shadow-sm' : 'hover:text-[var(--text-color)]'}`}
             title={t.modeTimed}
           >
-            <Clock className="w-3.5 h-3.5" />
-            <span>{t.modeTimed}</span>
+            <Clock className="w-3.5 h-3.5 hidden sm:block" />
+            <span className="whitespace-nowrap">{t.modeTimed}</span>
           </button>
 
           {/* Timed options if mode is timed */}
@@ -84,7 +84,7 @@ export default function ControlBar({
         {/* Center: Current Chapter Badge */}
         <button
           onClick={openChapterDrawer}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--sub-alt-color)] hover:bg-[var(--main-color)]/10 text-[var(--text-color)] border border-[var(--border-color)] hover:border-[var(--main-color)] transition-all group"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--sub-alt-color)] hover:bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] text-[var(--text-color)] border border-[var(--border-color)] hover:border-[var(--main-color)] transition-all group"
           title={t.drawerSubtitle}
         >
           <span className="font-semibold text-[var(--main-color)]">
@@ -114,7 +114,7 @@ export default function ControlBar({
           {!isEnglishText && (
             <button
               onClick={openKeyboardMappingModal}
-              className="px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 hover:border-amber-500 text-[var(--main-color)] text-[11px] font-medium transition-all flex items-center gap-1.5"
+              className="px-2.5 py-1.5 rounded-lg bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--main-color)_30%,transparent)] hover:border-[var(--main-color)] text-[var(--main-color)] text-[11px] font-medium transition-all flex items-center gap-1.5"
               title={lang === 'am' ? 'የአማርኛ ኪቦርድ አቀማመጥ ለመምረጥ ይጫኑ' : 'Click to choose Amharic keyboard mapping'}
             >
               <KeyboardIcon className="w-3.5 h-3.5" />

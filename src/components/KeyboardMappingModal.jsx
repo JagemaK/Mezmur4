@@ -68,7 +68,7 @@ export default function KeyboardMappingModal({
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[var(--main-color)]/10 border border-[var(--main-color)]/30 flex items-center justify-center text-[var(--main-color)]">
+            <div className="w-10 h-10 rounded-2xl bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--main-color)_30%,transparent)] flex items-center justify-center text-[var(--main-color)]">
               <Keyboard className="w-5 h-5" />
             </div>
             <div>
@@ -102,8 +102,8 @@ export default function KeyboardMappingModal({
                 onClick={() => applyMapping(info.id)}
                 className={`p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between gap-3 ${
                   isSelected 
-                    ? 'bg-[var(--main-color)]/10 border-[var(--main-color)] shadow-md shadow-amber-500/10' 
-                    : 'bg-[var(--bg-color)]/50 border-[var(--border-color)] hover:border-[var(--main-color)]/50'
+                    ? 'bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border-[var(--main-color)] shadow-md shadow-amber-500/10' 
+                    : 'bg-[color-mix(in_srgb,var(--bg-color)_50%,transparent)] border-[var(--border-color)] hover:border-[color-mix(in_srgb,var(--main-color)_50%,transparent)]'
                 }`}
               >
                 <div>
@@ -123,7 +123,7 @@ export default function KeyboardMappingModal({
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-[var(--border-color)]/40 text-[10px] text-[var(--sub-color)] font-mono">
+                <div className="flex items-center justify-between pt-2 border-t border-[color-mix(in_srgb,var(--border-color)_40%,transparent)] text-[10px] text-[var(--sub-color)] font-mono">
                   <span>{info.id === 'powergeez' ? 'Shift Key + Phonetic' : info.id === 'keyman' ? 'Multi-letter Combinations' : 'Standard'}</span>
                   <span className={`px-2 py-0.5 rounded ${isSelected ? 'bg-[var(--main-color)] text-black font-bold' : 'bg-[var(--sub-alt-color)] text-[var(--text-color)]'}`}>
                     {isSelected ? (isEnglish ? 'Selected' : 'ተመርጧል') : (isEnglish ? 'Select' : 'ይምረጡ')}
@@ -135,7 +135,7 @@ export default function KeyboardMappingModal({
         </div>
 
         {/* Live Test Sandbox */}
-        <div className="p-4 rounded-2xl bg-[var(--bg-color)]/60 border border-[var(--border-color)] mb-4">
+        <div className="p-4 rounded-2xl bg-[color-mix(in_srgb,var(--bg-color)_60%,transparent)] border border-[var(--border-color)] mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-[var(--main-color)] flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
@@ -173,9 +173,9 @@ export default function KeyboardMappingModal({
               <div>ኪይማን (Keyman / SIL)</div>
             </div>
 
-            <div className="divide-y divide-[var(--border-color)]/50">
+            <div className="divide-y divide-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
               {comparisonRows.map((r, idx) => (
-                <div key={idx} className="grid grid-cols-3 p-2 items-center hover:bg-[var(--sub-alt-color)]/30">
+                <div key={idx} className="grid grid-cols-3 p-2 items-center hover:bg-[color-mix(in_srgb,var(--sub-alt-color)_30%,transparent)]">
                   <div className="font-bold text-[var(--main-color)]">{r.sound}</div>
                   <div className="text-[var(--text-color)] font-mono text-[11px]">{r.powergeez}</div>
                   <div className="text-[var(--text-color)] font-mono text-[11px]">{r.keyman}</div>

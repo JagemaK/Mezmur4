@@ -57,7 +57,7 @@ export default function PhoneticGuideModal({ isOpen, onClose }) {
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[var(--main-color)]/10 border border-[var(--main-color)]/30 flex items-center justify-center text-[var(--main-color)]">
+            <div className="w-10 h-10 rounded-2xl bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--main-color)_30%,transparent)] flex items-center justify-center text-[var(--main-color)]">
               <Keyboard className="w-5 h-5" />
             </div>
             <div>
@@ -77,7 +77,7 @@ export default function PhoneticGuideModal({ isOpen, onClose }) {
         </div>
 
         {/* Live Interactive Sandbox Tester */}
-        <div className="my-4 p-4 rounded-2xl bg-[var(--bg-color)]/60 border border-[var(--border-color)]">
+        <div className="my-4 p-4 rounded-2xl bg-[color-mix(in_srgb,var(--bg-color)_60%,transparent)] border border-[var(--border-color)]">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-[var(--main-color)] flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
@@ -141,9 +141,9 @@ export default function PhoneticGuideModal({ isOpen, onClose }) {
               <div>ሳምንት (wa)</div>
             </div>
 
-            <div className="divide-y divide-[var(--border-color)]/50">
+            <div className="divide-y divide-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
               {sampleLetters.map(item => (
-                <div key={item.key} className="grid grid-cols-9 p-2 items-center text-center hover:bg-[var(--sub-alt-color)]/30">
+                <div key={item.key} className="grid grid-cols-9 p-2 items-center text-center hover:bg-[color-mix(in_srgb,var(--sub-alt-color)_30%,transparent)]">
                   <div className="font-bold text-[var(--main-color)] font-mono">{item.key}</div>
                   {item.row.map((cell, idx) => (
                     <div key={idx} className="text-[var(--text-color)] font-medium text-[11px]">

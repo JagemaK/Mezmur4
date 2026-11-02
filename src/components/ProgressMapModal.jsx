@@ -40,7 +40,7 @@ export default function ProgressMapModal({
         {/* Modal Header */}
         <div className="flex items-center justify-between pb-5 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-[var(--main-color)]/10 border border-[var(--main-color)]/30 flex items-center justify-center text-[var(--main-color)]">
+            <div className="w-11 h-11 rounded-2xl bg-[color-mix(in_srgb,var(--main-color)_10%,transparent)] border border-[color-mix(in_srgb,var(--main-color)_30%,transparent)] flex items-center justify-center text-[var(--main-color)]">
               <Trophy className="w-6 h-6" />
             </div>
             <div>
@@ -60,7 +60,7 @@ export default function ProgressMapModal({
         </div>
 
         {/* Global Progress Overview */}
-        <div className="my-5 p-5 rounded-2xl bg-[var(--bg-color)]/60 border border-[var(--border-color)] space-y-4">
+        <div className="my-5 p-5 rounded-2xl bg-[color-mix(in_srgb,var(--bg-color)_60%,transparent)] border border-[var(--border-color)] space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="text-xs text-[var(--sub-color)] font-mono">{t.completedChapters}</div>
@@ -119,7 +119,7 @@ export default function ProgressMapModal({
                     onSelectPsalm(p);
                     onClose();
                   }}
-                  className={`aspect-square rounded-xl p-1 flex flex-col items-center justify-center relative transition-all group ${isDone ? 'bg-amber-500/15 border border-amber-500/40 text-[var(--main-color)] hover:bg-amber-500/25' : 'bg-[var(--sub-alt-color)]/40 border border-[var(--border-color)]/60 text-[var(--sub-color)] hover:border-[var(--main-color)] hover:text-[var(--text-color)]'}`}
+                  className={`aspect-square rounded-xl p-1 flex flex-col items-center justify-center relative transition-all group ${isDone ? 'bg-amber-500/15 border border-amber-500/40 text-[var(--main-color)] hover:bg-amber-500/25' : 'bg-[color-mix(in_srgb,var(--sub-alt-color)_40%,transparent)] border border-[color-mix(in_srgb,var(--border-color)_60%,transparent)] text-[var(--sub-color)] hover:border-[var(--main-color)] hover:text-[var(--text-color)]'}`}
                   title={`${title} (${p.chapter}) ${isDone ? `• ${record.bestWpm} WPM` : ''}`}
                 >
                   <span className="text-[11px] font-bold font-mono">{p.chapter}</span>
