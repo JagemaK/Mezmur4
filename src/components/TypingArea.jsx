@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { RotateCcw, ChevronLeft, ChevronRight, MousePointerClick } from 'lucide-react';
 import { soundEngine } from '../utils/soundEngine';
-import { EthiopicPhoneticEngine } from '../utils/ethiopicTransliteration';
+import { EthiopicPhoneticEngine, getNextKeyHint } from '../utils/ethiopicTransliteration';
 import { TRANSLATIONS } from '../utils/translations';
 
 export default function TypingArea({
@@ -12,7 +12,8 @@ export default function TypingArea({
   setIsTyping,
   onNextPsalm,
   onPrevPsalm,
-  onKeyActivity
+  onKeyActivity,
+  onKeyHint
 }) {
   const containerRef = useRef(null);
   const inputRef = useRef(null);
@@ -100,6 +101,7 @@ export default function TypingArea({
     setTimeline([]);
     errorsThisSecond.current = 0;
     phoneticEngine.reset();
+    soundEngine.resetSequence();
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -154,51 +156,80 @@ export default function TypingArea({
     return () => clearInterval(interval);
   }, [startTime, keystrokes, settings.mode, settings.timedDuration]);
 
-  // Update Caret Position
-  useEffect(() => {
-    if (!caretRef.current) return;
+  // Caret placement, Monkeytype style: a thin bar ~1.2em tall centred on the
+  // line, positioned relative to the whole passage (not the word), with the
+  // passage scrolled so the active line is always the second visible line.
+  const wordsWrapRef = useRef(null);
 
-    const currentWordEl = wordRefs.current[currentWordIndex];
-    if (!currentWordEl) return;
+  const updateCaret = useCallback(() => {
+    const caret = caretRef.current;
+    const wrap = wordsWrapRef.current;
+    const container = containerRef.current;
+    const wordEl = wordRefs.current[currentWordIndex];
+    if (!caret || !wrap || !container || !wordEl) return;
 
-    const letters = currentWordEl.querySelectorAll('.letter');
+    const wrapRect = wrap.getBoundingClientRect();
+    const letters = wordEl.querySelectorAll('.letter');
     const inputLen = currentInput.length;
+    const anchor = letters[Math.min(inputLen, letters.length - 1)] || wordEl;
+    const rect = anchor.getBoundingClientRect();
+    const atEnd = inputLen >= letters.length;
 
-    let targetLeft = 0;
-    let targetTop = 0;
-    let targetHeight = 28;
+    const fontSize = parseFloat(getComputedStyle(anchor).fontSize) || 24;
+    const left = (atEnd ? rect.right : rect.left) - wrapRect.left;
+    const width = atEnd ? fontSize * 0.5 : rect.width;
+    const style = settings.caretStyle;
 
-    if (letters.length > 0) {
-      if (inputLen < letters.length) {
-        const letterEl = letters[inputLen];
-        targetLeft = letterEl.offsetLeft;
-        targetTop = letterEl.offsetTop;
-        targetHeight = letterEl.offsetHeight;
-      } else {
-        const lastLetter = letters[letters.length - 1];
-        targetLeft = lastLetter.offsetLeft + lastLetter.offsetWidth;
-        targetTop = lastLetter.offsetTop;
-        targetHeight = lastLetter.offsetHeight;
-      }
+    if (style === 'block') {
+      caret.style.width = `${width}px`;
+      caret.style.height = `${fontSize * 1.2}px`;
+      caret.style.top = `${rect.top - wrapRect.top + (rect.height - fontSize * 1.2) / 2}px`;
+    } else if (style === 'underline') {
+      caret.style.width = `${width}px`;
+      caret.style.height = `${Math.max(2, fontSize * 0.1)}px`;
+      caret.style.top = `${rect.top - wrapRect.top + (rect.height + fontSize * 1.1) / 2}px`;
     } else {
-      targetLeft = currentWordEl.offsetLeft;
-      targetTop = currentWordEl.offsetTop;
+      caret.style.width = `${Math.max(2, fontSize * 0.1)}px`;
+      caret.style.height = `${fontSize * 1.2}px`;
+      caret.style.top = `${rect.top - wrapRect.top + (rect.height - fontSize * 1.2) / 2}px`;
     }
+    caret.style.left = `${left}px`;
 
-    caretRef.current.style.left = `${targetLeft}px`;
-    caretRef.current.style.top = `${targetTop}px`;
-    caretRef.current.style.height = `${targetHeight}px`;
-
-    if (containerRef.current) {
-      const containerTop = containerRef.current.scrollTop;
-      const containerHeight = containerRef.current.clientHeight;
-      if (targetTop < containerTop + 20) {
-        containerRef.current.scrollTo({ top: Math.max(0, targetTop - 20), behavior: 'smooth' });
-      } else if (targetTop > containerTop + containerHeight - 60) {
-        containerRef.current.scrollTo({ top: targetTop - containerHeight / 2, behavior: 'smooth' });
-      }
+    // Show three lines; keep the active line second once past the first
+    const wordTop = wordEl.offsetTop;
+    let prevLineTop = null;
+    for (let i = currentWordIndex - 1; i >= 0; i--) {
+      const el = wordRefs.current[i];
+      if (el && el.offsetTop < wordTop) { prevLineTop = el.offsetTop; break; }
     }
-  }, [currentWordIndex, currentInput]);
+    const linePitch = prevLineTop !== null ? wordTop - prevLineTop : wordEl.offsetHeight + 12;
+    container.style.height = `${linePitch * 3}px`;
+    const targetScroll = prevLineTop !== null ? prevLineTop : 0;
+    if (Math.abs(container.scrollTop - targetScroll) > 1) {
+      container.scrollTo({ top: targetScroll, behavior: 'smooth' });
+    }
+  }, [currentWordIndex, currentInput, settings.caretStyle]);
+
+  useLayoutEffect(() => {
+    updateCaret();
+  }, [updateCaret, words, settings.fontSize, settings.fontFamily]);
+
+  // Re-measure when fonts finish loading or the window resizes
+  useEffect(() => {
+    window.addEventListener('resize', updateCaret);
+    document.fonts?.ready.then(updateCaret);
+    return () => window.removeEventListener('resize', updateCaret);
+  }, [updateCaret]);
+
+  // Caret stays solid while typing and only blinks after a pause
+  const [caretIdle, setCaretIdle] = useState(true);
+  const idleTimer = useRef(null);
+  const markCaretActive = () => {
+    setCaretIdle(false);
+    clearTimeout(idleTimer.current);
+    idleTimer.current = setTimeout(() => setCaretIdle(true), 900);
+  };
+  useEffect(() => () => clearTimeout(idleTimer.current), []);
 
   // Finish test
   const finishTest = useCallback(() => {
@@ -250,6 +281,7 @@ export default function TypingArea({
   // Handle Input Keydown
   const handleKeyDown = (e) => {
     if (e.key === 'Unidentified' || e.key === 'Process') return;
+    markCaretActive();
 
     // Notify virtual keyboard of key activity
     onKeyActivity && onKeyActivity(e.key, e.shiftKey);
@@ -276,7 +308,8 @@ export default function TypingArea({
     // Space: Advance to next word
     if (e.key === ' ') {
       e.preventDefault();
-      if (!currentInput && currentWordIndex === 0) return;
+      // Like Monkeytype, space on an empty word does nothing (no skipping)
+      if (!currentInput) return;
 
       const currentTargetWord = words[currentWordIndex] || '';
 
@@ -335,6 +368,7 @@ export default function TypingArea({
     // Backspace: Erase character
     if (e.key === 'Backspace') {
       e.preventDefault();
+      phoneticEngine.reset();
       if (currentInput.length > 0) {
         setCurrentInput(prev => prev.slice(0, -1));
         soundEngine.playKey();
@@ -364,6 +398,12 @@ export default function TypingArea({
     // Check Phonetic Input Mode (when typing Amharic and layout is not 'direct')
     if (!isEnglishText && settings.keyboardLayout !== 'direct') {
       const res = phoneticEngine.processKey(e.key);
+      if (res && !res.output && !res.replaceLength) {
+        // Separator key (') only resets composition
+        soundEngine.playKey();
+        setEngineTick(t => t + 1);
+        return;
+      }
       if (res && res.output) {
         let nextInput = currentInput;
         if (res.replaceLength > 0) {
@@ -374,9 +414,11 @@ export default function TypingArea({
         setCurrentInput(nextInput);
         soundEngine.playKey();
 
+        // A half-composed letter (s → ስ on the way to ሳ) is not a mistake
         const targetWord = words[currentWordIndex] || '';
-        const charIdx = nextInput.length - 1;
-        if (charIdx < targetWord.length && nextInput[charIdx] === targetWord[charIdx]) {
+        const onTrack = nextInput === targetWord.slice(0, nextInput.length)
+          || getNextKeyHint(phoneticEngine, settings.keyboardLayout, nextInput, targetWord)?.composing;
+        if (onTrack) {
           setKeystrokes(prev => ({ ...prev, correct: prev.correct + 1 }));
         } else {
           setKeystrokes(prev => ({ ...prev, incorrect: prev.incorrect + 1 }));
@@ -402,6 +444,18 @@ export default function TypingArea({
 
     setCurrentInput(prev => prev + typedChar);
   };
+
+  // Which keys come next (Amharic phonetic only). engineTick re-runs this
+  // when a key changes engine state without changing the text (the ' key).
+  const [engineTick, setEngineTick] = useState(0);
+  const keyHint = useMemo(() => {
+    if (isEnglishText || settings.keyboardLayout === 'direct') return null;
+    return getNextKeyHint(phoneticEngine, settings.keyboardLayout, currentInput, words[currentWordIndex] || '');
+  }, [currentInput, currentWordIndex, words, isEnglishText, settings.keyboardLayout, phoneticEngine, engineTick]);
+
+  useEffect(() => {
+    onKeyHint && onKeyHint(keyHint);
+  }, [keyHint]);
 
   // Finish automatically once the final word is typed correctly
   useEffect(() => {
@@ -528,19 +582,16 @@ export default function TypingArea({
       )}
       <div 
         ref={containerRef}
-        className={`typing-text relative max-h-[13.5rem] overflow-y-auto overflow-x-hidden leading-relaxed tracking-wide text-left ${settings.fontSize} ${fontClass} outline-none focus:outline-none`}
-        style={{ scrollBehavior: 'smooth' }}
+        className={`typing-text relative overflow-hidden leading-relaxed tracking-wide text-left ${settings.fontSize} ${fontClass} outline-none focus:outline-none`}
       >
+        <div ref={wordsWrapRef} className="relative flex flex-wrap gap-x-3.5 gap-y-3">
         <div
           ref={caretRef}
-          className={`absolute w-0.5 bg-[var(--caret-color)] rounded-full z-10 ${settings.caretStyle === 'smooth' ? 'caret-smooth caret-pulse' : settings.caretStyle === 'block' ? 'w-3 opacity-40 bg-[var(--caret-color)]' : 'caret-pulse'}`}
-          style={{
-            display: settings.caretStyle === 'off' ? 'none' : 'block',
-            transition: 'left 0.08s cubic-bezier(0.2, 0, 0, 1), top 0.08s cubic-bezier(0.2, 0, 0, 1)'
-          }}
+          aria-hidden="true"
+          className={`caret caret-${settings.caretStyle === 'block' || settings.caretStyle === 'underline' ? settings.caretStyle : 'line'} ${caretIdle ? 'caret-blink' : ''}`}
+          style={{ display: settings.caretStyle === 'off' || !isFocused ? 'none' : 'block' }}
         />
 
-        <div className="flex flex-wrap gap-x-3.5 gap-y-3">
           {words.map((targetWord, wIdx) => {
             const isCurrent = wIdx === currentWordIndex;
             const isPassed = wIdx < currentWordIndex;
@@ -556,6 +607,8 @@ export default function TypingArea({
                   let letterState = 'untyped';
                   if (cIdx < typedWord.length) {
                     letterState = typedWord[cIdx] === char ? 'correct' : 'incorrect';
+                    // Half-typed Amharic letter (ስ on the way to ሳ) is not an error
+                    if (isCurrent && keyHint?.composing && cIdx === typedWord.length - 1) letterState = 'composing';
                   }
 
                   return (

@@ -106,6 +106,14 @@ export const FIDEL_FAMILIES = {
 
 export const FIDEL_MAP = FIDEL_FAMILIES;
 
+// Labialised forms reached with consonant + W + vowel (qWe = ቈ, qWu = ቍ ...)
+const LABIAL_FORMS = {
+  qa: { e: 'ቈ', i: 'ቊ', a: 'ቋ', E: 'ቌ', u: 'ቍ' },
+  ka: { e: 'ኰ', i: 'ኲ', a: 'ኳ', E: 'ኴ', u: 'ኵ' },
+  ga: { e: 'ጐ', i: 'ጒ', a: 'ጓ', E: 'ጔ', u: 'ጕ' },
+  xa: { e: 'ኈ', i: 'ኊ', a: 'ኋ', E: 'ኌ', u: 'ኍ' },
+};
+
 // PowerGe'ez Consonant Table
 const POWERGEEZ_CONSONANTS = {
   'h': 'ha',
@@ -158,6 +166,7 @@ const KEYMAN_CONSONANTS = {
   'v': 'va',
   't': 'ta',
   'T': 'Ta',
+  'c': 'cha',
   'ch': 'cha',
   'C': 'Ca',
   'n': 'na',
@@ -251,6 +260,18 @@ export class EthiopicPhoneticEngine {
     this.activeFamily = null;
   }
 
+  clone() {
+    const copy = new EthiopicPhoneticEngine(this.layout);
+    copy.buffer = this.buffer;
+    copy.activeFamily = this.activeFamily;
+    copy.pendingWa = this.pendingWa;
+    return copy;
+  }
+
+  hasPending() {
+    return Boolean(this.buffer || this.pendingWa);
+  }
+
   setLayout(layout) {
     this.layout = layout;
     this.reset();
@@ -259,6 +280,7 @@ export class EthiopicPhoneticEngine {
   reset() {
     this.buffer = '';
     this.activeFamily = null;
+    this.pendingWa = null;
   }
 
   processKey(key) {
@@ -271,12 +293,40 @@ export class EthiopicPhoneticEngine {
       return { output: key, replaceLength: 0 };
     }
 
-    // Punctuation shortcuts
-    if (key === ',' && this.buffer === '') return { output: '፣', replaceLength: 0 };
-    if (key === ';' && this.buffer === '') return { output: '፤', replaceLength: 0 };
-    if (key === ':' && this.buffer === ':') {
+    // Apostrophe separates letters that would otherwise merge
+    // (c'hu = ችሁ rather than ቹ); it produces no text itself.
+    if (key === "'") {
       this.reset();
-      return { output: '።', replaceLength: 1 };
+      return { output: '', replaceLength: 0 };
+    }
+
+    // Ethiopic punctuation: works after any letter, not only at a word start.
+    //   :  ፡   ::  ።   :-  ፥   ;  ፤   ,  ፣
+    if (key === ':') {
+      if (this.buffer === ':') {
+        this.reset();
+        return { output: '።', replaceLength: 1 };
+      }
+      this.reset();
+      this.buffer = ':';
+      return { output: '፡', replaceLength: 0 };
+    }
+    if (key === '-' && this.buffer === ':') {
+      this.reset();
+      return { output: '፥', replaceLength: 1 };
+    }
+    if (key === ';') { this.reset(); return { output: '፤', replaceLength: 0 }; }
+    if (key === ',') { this.reset(); return { output: '፣', replaceLength: 0 }; }
+
+    // Labialised 8th order is consonant + "Wa" (e.g. qWa = ቋ); "W" already
+    // produced the letter, so a trailing "a" just confirms it and q/k/g/x
+    // take their other labialised vowels (qWe = ቈ, qWu = ቍ).
+    if (this.pendingWa) {
+      const { letter, family } = this.pendingWa;
+      this.reset();
+      const labial = LABIAL_FORMS[family]?.[key];
+      if (labial) return { output: labial, replaceLength: 1 };
+      if (key === 'a') return { output: letter, replaceLength: 1 };
     }
 
     if (this.layout === 'powergeez') {
@@ -315,7 +365,9 @@ export class EthiopicPhoneticEngine {
     if (this.activeFamily) {
       const resolved = this.resolveVowel(this.activeFamily, key);
       if (resolved) {
+        const family = this.activeFamily;
         this.reset();
+        if (key === 'W') this.pendingWa = { letter: resolved, family };
         return { output: resolved, replaceLength: 1 };
       }
     }
@@ -358,7 +410,9 @@ export class EthiopicPhoneticEngine {
     if (this.activeFamily) {
       const resolved = this.resolveVowel(this.activeFamily, key);
       if (resolved) {
+        const family = this.activeFamily;
         this.reset();
+        if (key === 'W') this.pendingWa = { letter: resolved, family };
         return { output: resolved, replaceLength: 1 };
       }
     }
@@ -385,8 +439,111 @@ export class EthiopicPhoneticEngine {
     if (vowelKey === 'a') return family[3]; // 4th order (ራብዕ)
     if (vowelKey === 'E' || vowelKey === 'e') return family[4]; // 5th order (ኃምስ)
     if (vowelKey === 'o') return family[6]; // 7th order (ሳብዕ)
-    if (vowelKey === 'w') return family[7] || family[3]; // 8th order (ዋ)
+    if (vowelKey === 'W' && family[7] && family[7] !== family[0]) return family[7]; // 8th order (ዋ)
 
     return null;
   }
 }
+
+// Run a key sequence through a fresh engine and return the text it produces.
+export function simulateKeys(layout, keys) {
+  const engine = new EthiopicPhoneticEngine(layout);
+  let out = '';
+  for (const key of keys) {
+    const res = engine.processKey(key);
+    out = out.slice(0, out.length - res.replaceLength) + res.output;
+  }
+  return out;
+}
+
+const SEQUENCE_ALPHABET = 'aeiouEbcdfghjklmnpqrstvwxyzABCDFGHIJKLMNOPQRSTUVWXYZ:-;,?!0123456789';
+const sequenceCache = {};
+
+/**
+ * Reverse map { character: shortest key sequence } for a layout, derived by
+ * driving the real engine so hints can never drift from actual behaviour.
+ */
+export function getKeySequences(layout = 'powergeez') {
+  if (layout === 'direct') return {};
+  if (sequenceCache[layout]) return sequenceCache[layout];
+
+  const map = {};
+  let frontier = [''];
+  for (let len = 1; len <= 4; len++) {
+    const next = [];
+    for (const prefix of frontier) {
+      for (const key of SEQUENCE_ALPHABET) {
+        const seq = prefix + key;
+        const out = simulateKeys(layout, seq);
+        if (out.length !== 1) continue;
+        if (!(out in map)) map[out] = seq;
+        next.push(seq);
+      }
+    }
+    frontier = next;
+  }
+  sequenceCache[layout] = map;
+  return map;
+}
+
+function applyKeys(engine, text, keys) {
+  let out = text;
+  for (const key of keys) {
+    const res = engine.processKey(key);
+    out = out.slice(0, out.length - res.replaceLength) + res.output;
+  }
+  return out;
+}
+
+/**
+ * What to press next to keep typing `targetWord`, given the engine's live
+ * state and what is already in the input. Returns one of:
+ *   { type: 'char', char, keys, typed }  keys still to press (typed = already pressed)
+ *   { type: 'space' } | { type: 'backspace' } | null
+ */
+export function getNextKeyHint(engine, layout, input, targetWord) {
+  if (!targetWord || layout === 'direct') return null;
+  const map = getKeySequences(layout);
+  const last = input.length - 1;
+
+  // Mid-composition: last letter is a prefix of the wanted one (s → ስ, want ሳ)
+  if (last >= 0 && engine.hasPending() && input[last] !== targetWord[last]
+      && input.slice(0, last) === targetWord.slice(0, last)) {
+    const want = targetWord.slice(0, last + 1);
+    let frontier = [''];
+    for (let depth = 1; depth <= 2; depth++) {
+      const next = [];
+      for (const prefix of frontier) {
+        for (const key of SEQUENCE_ALPHABET) {
+          const cont = prefix + key;
+          if (applyKeys(engine.clone(), input, cont) === want) {
+            const full = map[targetWord[last]] || cont;
+            const typed = full.endsWith(cont) ? full.slice(0, full.length - cont.length) : '';
+            return { type: 'char', char: targetWord[last], keys: cont, typed, composing: true };
+          }
+          next.push(cont);
+        }
+      }
+      frontier = next;
+    }
+  }
+
+  if (input !== targetWord.slice(0, input.length)) return { type: 'backspace' };
+  if (input.length >= targetWord.length) return { type: 'space' };
+
+  const char = targetWord[input.length];
+  let keys = map[char] || char;
+  if (applyKeys(engine.clone(), input, keys) !== input + char) keys = "'" + keys;
+  return { type: 'char', char, keys, typed: '' };
+}
+
+// Punctuation & symbols shown in the keyboard legend
+export const SYMBOL_KEYS = [
+  { char: '፡', keys: ':', nameEn: 'word space', nameAm: 'ሁለት ነጥብ' },
+  { char: '።', keys: '::', nameEn: 'full stop', nameAm: 'አራት ነጥብ' },
+  { char: '፥', keys: ':-', nameEn: 'colon', nameAm: 'ነጠላ ሰረዝ' },
+  { char: '፤', keys: ';', nameEn: 'semicolon', nameAm: 'ድርብ ሰረዝ' },
+  { char: '፣', keys: ',', nameEn: 'comma', nameAm: 'ነጠላ ሰረዝ' },
+  { char: '?', keys: '?', nameEn: 'question', nameAm: 'ጥያቄ' },
+  { char: '!', keys: '!', nameEn: 'exclamation', nameAm: 'ቃለ አጋኖ' },
+];
