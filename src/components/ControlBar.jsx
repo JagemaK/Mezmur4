@@ -6,7 +6,6 @@ import {
   ChevronRight, 
   Globe, 
   Hash, 
-  Type,
   BookOpen,
   Keyboard as KeyboardIcon
 } from 'lucide-react';
@@ -133,13 +132,28 @@ export default function ControlBar({
             </button>
           )}
 
+          {/* Capital letters toggle (English only; LORD / God always stay capitalised) */}
+          {isEnglishText && (
+            <button
+              onClick={() => updateSettings({ includeCapitals: !settings.includeCapitals })}
+              aria-pressed={!settings.includeCapitals}
+              className={`min-w-[2rem] px-2 py-1 rounded-lg border text-[11px] font-mono font-semibold transition-colors ${settings.includeCapitals ? 'border-[var(--border-color)] text-[var(--main-color)] bg-[var(--sub-alt-color)]' : 'border-[var(--border-color)] text-[var(--sub-color)] hover:text-[var(--text-color)]'}`}
+              title={settings.includeCapitals ? t.capitalsOn : t.capitalsOff}
+              aria-label={settings.includeCapitals ? t.capitalsOn : t.capitalsOff}
+            >
+              {settings.includeCapitals ? 'Aa' : 'aa'}
+            </button>
+          )}
+
           {/* Punctuation toggle */}
           <button
             onClick={() => updateSettings({ includePunctuation: !settings.includePunctuation })}
-            className={`p-1.5 rounded-lg border text-[11px] transition-colors ${settings.includePunctuation ? 'border-[var(--border-color)] text-[var(--main-color)] bg-[var(--sub-alt-color)]' : 'border-transparent text-[var(--sub-color)] line-through hover:text-[var(--text-color)]'}`}
-            title={t.punctuationToggle}
+            aria-pressed={!settings.includePunctuation}
+            className={`min-w-[2rem] px-2 py-1 rounded-lg border text-[11px] font-mono font-semibold transition-colors ${settings.includePunctuation ? 'border-[var(--border-color)] text-[var(--main-color)] bg-[var(--sub-alt-color)]' : 'border-[var(--border-color)] text-[var(--sub-color)] line-through hover:text-[var(--text-color)]'}`}
+            title={settings.includePunctuation ? t.punctuationOn : t.punctuationOff}
+            aria-label={settings.includePunctuation ? t.punctuationOn : t.punctuationOff}
           >
-            <Type className="w-3.5 h-3.5" />
+            {isEnglishText ? '.,?' : '።፥?'}
           </button>
 
           {/* Geez numerals toggle (only for Amharic text) */}

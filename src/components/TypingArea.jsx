@@ -52,14 +52,25 @@ export default function TypingArea({
     raw = raw.replace(/\s+([,.;:!?።፤፥፣፧])/g, '$1');
 
     if (!settings.includePunctuation) {
-      if (isEnglishText) {
-        raw = raw.replace(/[.,/#!$%^&*;:{}=\-_`~()?"']/g, '').replace(/\s+/g, ' ').trim();
-      } else {
-        raw = raw.replace(/[።፤፥፣፧፡]/g, '').replace(/\s+/g, ' ').trim();
-      }
+      // Dashes and ellipses separate words; every other symbol (. , ; : ? ! ’
+      // ። ፥ ፤ ...) is dropped, so only letters, numbers and spaces remain.
+      raw = raw
+        .replace(/[-–—…/]/g, ' ')
+        .replace(/[^\p{L}\p{M}\p{N}\s]/gu, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    // English without capitals, keeping the divine names LORD, GOD and God
+    // (also LORD’s / Gods etc.). Amharic script has no capital letters.
+    if (isEnglishText && !settings.includeCapitals) {
+      raw = raw
+        .split(' ')
+        .map(w => (/^(LORD|GOD|God)(['’]?s)?(?![A-Za-z])/.test(w) ? w : w.toLowerCase()))
+        .join(' ');
     }
     return raw;
-  }, [activeVerses, activeVerseIndex, settings.mode, settings.includePunctuation, isEnglishText]);
+  }, [activeVerses, activeVerseIndex, settings.mode, settings.includePunctuation, settings.includeCapitals, isEnglishText]);
 
   // Words array
   const words = useMemo(() => {
@@ -111,7 +122,7 @@ export default function TypingArea({
   useEffect(() => {
     setActiveVerseIndex(0);
     resetTest();
-  }, [currentPsalm.id, settings.mode, settings.includePunctuation, settings.textLanguage, settings.keyboardLayout]);
+  }, [currentPsalm.id, settings.mode, settings.includePunctuation, settings.includeCapitals, settings.textLanguage, settings.keyboardLayout]);
 
   // Handle focus
   const focusInput = () => {
