@@ -19,6 +19,7 @@ export const DEFAULT_SETTINGS = {
   fontFamily: 'ethiopic',   // 'ethiopic' (Noto Sans), 'serif' (Noto Serif), 'nyala'
   inputMode: 'phonetic',    // 'direct' (native keyboard), 'phonetic' (QWERTY -> Amharic)
   includePunctuation: true, // Keep marks (። ፤ ፣ or . , ;)
+  includeCapitals: true,    // English only; off = lowercase except LORD / God
   geezNumerals: true,       // ፩ ፪ ፫ vs 1 2 3
   mode: 'chapter',          // 'chapter' (full psalm), 'verse' (one verse at a time), 'timed'
   timedDuration: 60,        // 30, 60, 120 seconds
