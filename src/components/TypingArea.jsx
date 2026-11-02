@@ -101,6 +101,7 @@ export default function TypingArea({
     setTimeline([]);
     errorsThisSecond.current = 0;
     phoneticEngine.reset();
+    soundEngine.resetSequence();
     if (inputRef.current) {
       inputRef.current.focus();
     }

@@ -12,7 +12,7 @@ export const DEFAULT_SETTINGS = {
   textLanguage: 'en',       // 'am' (Amharic Psalms) or 'en' (English Psalms)
   keyboardLayout: 'powergeez', // 'powergeez', 'keyman', 'standard', 'direct'
   showVirtualKeyboard: true,// Show on-screen keyboard
-  soundType: 'begena',      // 'begena', 'thock', 'cherry_blue', 'typewriter', 'off'
+  soundType: 'type_with_begena', // 'type_with_begena', 'begena', 'thock', 'cherry_blue', 'typewriter', 'off'
   soundVolume: 0.5,
   caretStyle: 'smooth',     // 'smooth', 'block', 'underline', 'off'
   fontSize: 'text-2xl',     // 'text-xl', 'text-2xl', 'text-3xl', 'text-4xl'

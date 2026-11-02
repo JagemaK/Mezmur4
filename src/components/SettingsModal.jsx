@@ -144,6 +144,7 @@ export default function SettingsModal({
             </div>
             <div className="grid grid-cols-3 gap-2">
               {[
+                { id: 'type_with_begena', label: isEnglish ? 'Type with Begena' : 'በበገና መተየብ' },
                 { id: 'begena', label: 'Begena (Harp)' },
                 { id: 'thock', label: 'Topre Thock' },
                 { id: 'cherry_blue', label: 'Cherry MX Blue' },

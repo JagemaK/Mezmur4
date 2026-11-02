@@ -56,8 +56,9 @@ export default function Header({
   const t = TRANSLATIONS[lang] || TRANSLATIONS.en;
 
   // Sound toggle cycle
-  const soundModes = ['begena', 'thock', 'cherry_blue', 'typewriter', 'off'];
+  const soundModes = ['type_with_begena', 'begena', 'thock', 'cherry_blue', 'typewriter', 'off'];
   const soundLabels = {
+    type_with_begena: lang === 'am' ? 'በበገና መተየብ (Type with Begena)' : 'Type with Begena',
     begena: lang === 'am' ? 'በገና (Begena Harp)' : 'Begena (Ethiopian Harp)',
     thock: 'Topre Thock',
     cherry_blue: 'Cherry MX Blue',
@@ -229,7 +230,9 @@ export default function Header({
             <Volume2 className="w-4 h-4 text-[var(--main-color)]" />
           )}
           <span className="hidden lg:inline text-[11px] font-mono">
-            {settings.soundType === 'begena' ? (lang === 'am' ? 'በገና' : 'Begena') : settings.soundType}
+            {settings.soundType === 'type_with_begena'
+              ? (lang === 'am' ? 'በበገና መተየብ' : 'Type with Begena')
+              : settings.soundType === 'begena' ? (lang === 'am' ? 'በገና' : 'Begena') : settings.soundType}
           </span>
         </button>
 
