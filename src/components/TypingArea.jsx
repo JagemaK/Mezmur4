@@ -336,9 +336,9 @@ export default function TypingArea({
       }));
 
       if (currentInput === currentTargetWord) {
-        soundEngine.playKey();
+        soundEngine.playKey(e.key);
       } else {
-        soundEngine.playError();
+        soundEngine.playError(e.key);
         errorsThisSecond.current++;
       }
 
@@ -371,7 +371,7 @@ export default function TypingArea({
       phoneticEngine.reset();
       if (currentInput.length > 0) {
         setCurrentInput(prev => prev.slice(0, -1));
-        soundEngine.playKey();
+        soundEngine.playKey(e.key);
       } else if (currentWordIndex > 0) {
         const prevWord = typedWords[currentWordIndex - 1];
         if (prevWord !== undefined) {
@@ -380,7 +380,7 @@ export default function TypingArea({
           const nextTyped = [...typedWords];
           nextTyped.pop();
           setTypedWords(nextTyped);
-          soundEngine.playKey();
+          soundEngine.playKey(e.key);
         }
       }
       return;
@@ -400,7 +400,7 @@ export default function TypingArea({
       const res = phoneticEngine.processKey(e.key);
       if (res && !res.output && !res.replaceLength) {
         // Separator key (') only resets composition
-        soundEngine.playKey();
+        soundEngine.playKey(e.key);
         setEngineTick(t => t + 1);
         return;
       }
@@ -412,7 +412,7 @@ export default function TypingArea({
           nextInput += res.output;
         }
         setCurrentInput(nextInput);
-        soundEngine.playKey();
+        soundEngine.playKey(e.key);
 
         // A half-composed letter (s → ስ on the way to ሳ) is not a mistake
         const targetWord = words[currentWordIndex] || '';
@@ -434,10 +434,10 @@ export default function TypingArea({
     const isCorrect = charIdx < targetWord.length && typedChar === targetWord[charIdx];
 
     if (isCorrect) {
-      soundEngine.playKey();
+      soundEngine.playKey(e.key);
       setKeystrokes(prev => ({ ...prev, correct: prev.correct + 1 }));
     } else {
-      soundEngine.playError();
+      soundEngine.playError(e.key);
       errorsThisSecond.current++;
       setKeystrokes(prev => ({ ...prev, incorrect: prev.incorrect + 1 }));
     }
